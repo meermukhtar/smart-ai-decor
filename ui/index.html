@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SmartSpace AI - Virtual Interior Staging & 3D Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  
+  <!-- Three.js and Loaders for Interactive 3D -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/OBJLoader.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/PLYLoader.js"></script>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="app-header">
+    <div class="brand">
+      <div class="brand-icon">✨</div>
+      <div>
+        <h1 class="brand-title">SmartSpace AI</h1>
+        <p class="brand-subtitle">Virtual Staging & 3D Interior Architecture</p>
+      </div>
+    </div>
+    <div class="header-status">
+      <div class="gpu-badge">
+        <span class="pulse-dot"></span>
+        <span>Local GPU RTX 3080 Ti Active</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="app-container">
+
+    <!-- Left Column: Controls & Presets -->
+    <aside class="card control-panel">
+      <h2 class="section-title">🎨 Design Configuration</h2>
+
+      <!-- Step 1: Image Upload -->
+      <div class="form-group">
+        <label class="form-label">1. Empty Room Image</label>
+        <div class="dropzone" id="dropzone">
+          <div class="dropzone-icon">📸</div>
+          <p class="dropzone-text"><strong>Click to browse</strong> or drag & drop empty room photo</p>
+          <input type="file" id="imageInput" accept="image/*" style="display: none;">
+        </div>
+        <button type="button" class="btn-sample" id="btnSample">⚡ Use Sample Empty Room (rooms.jpeg)</button>
+        <div class="preview-container" id="previewContainer">
+          <img id="previewImg" class="preview-img" alt="Room preview">
+        </div>
+      </div>
+
+      <!-- Step 2: Design Presets / Templates -->
+      <div class="form-group">
+        <label class="form-label">2. Prompt & Layout Templates</label>
+        <div class="preset-grid">
+          <button type="button" class="preset-btn active" data-preset="bedroom_twin_study">
+            <span class="preset-title">🛏️ Master Bed + Study</span>
+            <span class="preset-desc">Twin nursery, king bed, desk</span>
+          </button>
+          <button type="button" class="preset-btn" data-preset="scandinavian_living">
+            <span class="preset-title">🛋️ Scandi Living Room</span>
+            <span class="preset-desc">Bouclé sofa, oak & marble</span>
+          </button>
+          <button type="button" class="preset-btn" data-preset="executive_office">
+            <span class="preset-title">💼 Executive Office</span>
+            <span class="preset-desc">Walnut desk, dual monitor</span>
+          </button>
+          <button type="button" class="preset-btn" data-preset="home_gym">
+            <span class="preset-title">🏋️ Performance Gym</span>
+            <span class="preset-desc">Rubber floor, dumbbell rack</span>
+          </button>
+          <button type="button" class="preset-btn" data-preset="minimal_dining">
+            <span class="preset-title">🍽️ Minimalist Dining</span>
+            <span class="preset-desc">Oak table, linear pendant</span>
+          </button>
+          <button type="button" class="preset-btn" data-preset="cozy_lounge">
+            <span class="preset-title">☕ Cozy Lounge</span>
+            <span class="preset-desc">Warm lighting, plush fabrics</span>
+          </button>
+          <button type="button" class="preset-btn" data-preset="penthouse_suite">
+            <span class="preset-title">🏙️ Penthouse Suite</span>
+            <span class="preset-desc">Italian leather, bronze panel</span>
+          </button>
+          <button type="button" class="preset-btn" data-preset="japandi_zen">
+            <span class="preset-title">🎋 Japandi Zen Suite</span>
+            <span class="preset-desc">Tatami platform, tranquil</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Step 3: Room Type & Style -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+        <div class="form-group">
+          <label class="form-label">Room Type</label>
+          <select id="roomType" class="form-select">
+            <option value="bedroom" selected>Bedroom</option>
+            <option value="living_room">Living Room</option>
+            <option value="office">Office</option>
+            <option value="gym">Home Gym</option>
+            <option value="dining_room">Dining Room</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Interior Style</label>
+          <select id="styleSelect" class="form-select">
+            <option value="modern_luxury" selected>Modern Luxury</option>
+            <option value="scandinavian">Scandinavian</option>
+            <option value="minimalist">Minimalist</option>
+            <option value="industrial">Industrial Loft</option>
+            <option value="cozy_contemporary">Cozy Contemporary</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Description Prompt Header with AI Polish & Quality Meter -->
+      <div class="form-group" style="margin-bottom: 8px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <label class="form-label" style="margin-bottom: 0;">3. Styling Prompt & Directives</label>
+          <button type="button" class="btn-enhance-prompt" id="btnEnhancePrompt" title="Automatically polish prompt with high-end designer finishes and lighting">
+            <span>✨ AI Polish & Enhance</span>
+          </button>
+        </div>
+
+        <textarea id="descriptionInput" class="form-textarea" placeholder="Describe the layout, furniture pieces, materials and styling..."></textarea>
+        
+        <!-- Prompt Quality Indicator -->
+        <div class="prompt-meter" id="promptMeter">
+          <span class="meter-label">Prompt Realism Score:</span>
+          <span class="meter-badge badge-luxury" id="meterBadge">⭐ High-End Architectural</span>
+        </div>
+
+        <!-- Quick-Add Feature Chips -->
+        <div class="prompt-chips-section">
+          <div class="chips-group">
+            <span class="chips-category">🪵 Finishes:</span>
+            <button type="button" class="prompt-chip" data-chip="fluted dark walnut wood">+ Fluted Walnut</button>
+            <button type="button" class="prompt-chip" data-chip="plush white bouclé fabric">+ White Bouclé</button>
+            <button type="button" class="prompt-chip" data-chip="honed Carrara marble">+ Carrara Marble</button>
+            <button type="button" class="prompt-chip" data-chip="brushed brass hardware">+ Brushed Brass</button>
+            <button type="button" class="prompt-chip" data-chip="acoustic wood-slat feature wall">+ Wood Slats</button>
+          </div>
+          <div class="chips-group" style="margin-top: 6px;">
+            <span class="chips-category">💡 Lighting:</span>
+            <button type="button" class="prompt-chip" data-chip="warm 2700K recessed cove ceiling lighting">+ 2700K Cove</button>
+            <button type="button" class="prompt-chip" data-chip="soft diffused morning natural window sunlight">+ Morning Sun</button>
+            <button type="button" class="prompt-chip" data-chip="minimalist linear brass pendant fixture">+ Brass Pendant</button>
+          </div>
+          <div class="chips-group" style="margin-top: 6px;">
+            <span class="chips-category">🌿 Decor:</span>
+            <button type="button" class="prompt-chip" data-chip="large potted fiddle-leaf fig in ceramic planter">+ Fiddle Leaf Fig</button>
+            <button type="button" class="prompt-chip" data-chip="oversized plush textured wool area rug">+ Wool Area Rug</button>
+            <button type="button" class="prompt-chip" data-chip="framed minimalist gallery canvas wall art">+ Canvas Art</button>
+            <button type="button" class="prompt-chip" data-chip="sheer floor-to-ceiling linen drapery">+ Linen Drapes</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <button type="button" class="btn-primary" id="btnSubmit">
+        <span>🚀 Stage Room & Generate 3D Studio</span>
+      </button>
+
+      <!-- Progress Box -->
+      <div class="loading-box" id="loadingBox">
+        <div class="spinner"></div>
+        <p class="loading-text" id="loadingText">Analyzing empty room architecture...</p>
+      </div>
+    </aside>
+
+    <!-- Right Column: Studio Results -->
+    <section class="card studio-card">
+      
+      <!-- Initial Placeholder State -->
+      <div class="empty-placeholder" id="emptyPlaceholder">
+        <div class="placeholder-icon">🛋️</div>
+        <h3>No Room Generated Yet</h3>
+        <p>Select a design template on the left, upload an empty room photo, and click <strong>Stage Room</strong> to view HD multi-angle renders and interactive 3D studio.</p>
+      </div>
+
+      <!-- Results View -->
+      <div id="resultsStudio" style="display: none; height: 100%; flex-direction: column;">
+        
+        <!-- Summary Header -->
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+          <div>
+            <h2 style="font-size: 1.25rem; font-weight: 700;" id="resRoomTitle">Master Bedroom (Modern Luxury)</h2>
+            <p style="font-size: 0.8rem; color: var(--text-muted);" id="resDimensions">Est. Floor: 4.0 m² | 100% Free Space Staged</p>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <span class="gpu-badge" style="background: rgba(99, 102, 241, 0.15); border-color: rgba(99, 102, 241, 0.4); color: #a5b4fc;" id="badgeRoomType">bedroom</span>
+            <span class="gpu-badge" style="background: rgba(168, 85, 247, 0.15); border-color: rgba(168, 85, 247, 0.4); color: #d8b4fe;" id="badgeStyle">modern_luxury</span>
+          </div>
+        </div>
+
+        <!-- Tabs Navigation -->
+        <div class="tabs-nav">
+          <button type="button" class="tab-btn active" data-tab="tab-angles">📸 Multi-Angle 3D Rotator</button>
+          <button type="button" class="tab-btn" data-tab="tab-3d">🧊 Interactive 3D Studio</button>
+          <button type="button" class="tab-btn" data-tab="tab-spatial">📐 Spatial Analysis & Floor Plan</button>
+          <button type="button" class="tab-btn" data-tab="tab-json">💻 Raw API Response</button>
+        </div>
+
+        <!-- Tab 1: Multi-Angle Rotator -->
+        <div class="tab-content active" id="tab-angles">
+          <div class="view-rotator-container">
+            <div class="image-stage">
+              <span class="stage-badge" id="currentAngleBadge">Front View (0°)</span>
+              <div class="stage-controls">
+                <button type="button" class="ctrl-btn" id="btnToggleBeforeAfter">Toggle Before / After</button>
+                <a class="ctrl-btn" id="btnDownloadAngle" href="#" target="_blank" download>Download HD</a>
+              </div>
+              <img id="stageImage" class="stage-img" src="" alt="Staged View">
+            </div>
+
+            <!-- Angle Selector Toolbar -->
+            <div class="angles-toolbar">
+              <div class="angle-pills" id="anglePillsContainer">
+                <!-- Dynamically populated -->
+              </div>
+              <div class="rotator-slider-box">
+                <span>🔄 360° Rotator:</span>
+                <input type="range" id="angleSlider" class="rotator-slider" min="0" max="4" value="0" step="1">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 2: Interactive 3D Studio (WebGL) -->
+        <div class="tab-content" id="tab-3d">
+          <div class="canvas-3d-container">
+            <div class="canvas-3d-actions">
+              <button type="button" class="ctrl-btn" id="btnResetCamera">Reset Camera</button>
+              <button type="button" class="ctrl-btn" id="btnToggleAutoSpin">Auto-Rotate</button>
+              <a class="ctrl-btn" id="btnDownloadOBJ" href="#" target="_blank" download>Download .OBJ</a>
+              <a class="ctrl-btn" id="btnDownloadPLY" href="#" target="_blank" download>Download .PLY</a>
+            </div>
+            <div id="canvas-3d"></div>
+            <div class="canvas-3d-overlay">
+              💡 Left Click: Rotate | Scroll: Zoom | Right Click: Pan
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 3: Spatial Analysis & Floor Plan -->
+        <div class="tab-content" id="tab-spatial">
+          <div class="analysis-grid">
+            <div class="analysis-card">
+              <h3 style="font-size: 0.95rem; font-weight: 600;">Detected Zones & Placement</h3>
+              <img id="spatialAnnotatedImg" class="analysis-img" alt="Annotated Layout">
+            </div>
+            <div class="analysis-card">
+              <h3 style="font-size: 0.95rem; font-weight: 600;">3D Depth Surface Map</h3>
+              <img id="spatialDepthImg" class="analysis-img" alt="Depth Surface">
+            </div>
+          </div>
+
+          <div class="analysis-card" style="margin-bottom: 16px;">
+            <h3 style="font-size: 0.95rem; font-weight: 600; margin-bottom: 10px;">Placed Furniture Catalog</h3>
+            <table class="items-table">
+              <thead>
+                <tr>
+                  <th>Item Name</th>
+                  <th>Category</th>
+                  <th>Placement Box (X, Y, W, H)</th>
+                </tr>
+              </thead>
+              <tbody id="placedItemsTableBody"></tbody>
+            </table>
+          </div>
+
+          <div class="analysis-card">
+            <h3 style="font-size: 0.95rem; font-weight: 600; margin-bottom: 10px;">AI Spatial Recommendations</h3>
+            <ul id="suggestionsList" style="padding-left: 20px; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6;"></ul>
+          </div>
+        </div>
+
+        <!-- Tab 4: Raw JSON Response -->
+        <div class="tab-content" id="tab-json">
+          <div style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
+            <button type="button" class="ctrl-btn" id="btnCopyJson">📋 Copy JSON</button>
+          </div>
+          <pre class="json-viewer" id="jsonViewer"></pre>
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

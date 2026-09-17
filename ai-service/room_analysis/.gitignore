@@ -1,0 +1,42 @@
+cat > .gitignore <<'EOF'
+# Python
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Environment
+.env
+.env.*
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+
+# Python tooling
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Generated files
+*.zip
+*.log
+
+# AI / generated data
+*.ply
+runs/
+results/
+outputs/
+
+# Large model files
+*.pt
+*.pth
+*.onnx
+
+# Jupyter
+.ipynb_checkpoints/
+EOF
